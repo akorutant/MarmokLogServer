@@ -173,9 +173,11 @@ function setupServer() {
 
   app.use(expressLayouts);
 
-  app.set('views', join(__dirname, 'views'));
-  app.set('view engine', 'ejs');
-  app.use('/assets', express.static(join(__dirname, 'public')));
+
+  // Static file serving - fix the paths to match your new structure
+  app.use('/assets/css', express.static(join(__dirname, 'public/css')));
+  app.use('/assets/js', express.static(join(__dirname, 'public/js')));
+  app.use('/assets/fonts', express.static(join(__dirname, 'assets/fonts')));
   app.use('/fonts', express.static(join(__dirname, 'node_modules/@fortawesome/fontawesome-free')));
 
   // Redirect root to logs page

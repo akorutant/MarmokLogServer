@@ -54,6 +54,8 @@ const authConfig = {
   realm: 'Logs Dashboard'
 };
 
+// Этот фрагмент кода нужно добавить/изменить в функцию buildLogStructure() в logServer.ts
+
 const buildLogStructure = () => {
   const structure: LogEntry[] = [];
 
@@ -62,7 +64,8 @@ const buildLogStructure = () => {
       const entries = fs.readdirSync(dirPath, { withFileTypes: true });
 
       entries.forEach(entry => {
-        if (entry.name.endsWith('-audit.json')) {
+        // Пропускаем audit.json файлы и .gz архивы
+        if (entry.name.endsWith('-audit.json') || entry.name.endsWith('.gz')) {
           return;
         }
 
@@ -96,6 +99,43 @@ const buildLogStructure = () => {
 
   walkDir(logsPath, structure);
   return structure;
+};
+
+// Также нужно изменить функцию streamHandler для фильтрации .gz файлов
+const streamHandler: RequestHandler = (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+
+  const sendUpdate = () => {
+    const filesData: LogFileData[] = [];
+    const processEntries = (entries: LogEntry[]) => {
+      for (const entry of entries) {
+        if (entry.type === 'file' && !entry.name.endsWith('.gz')) {
+          filesData.push({
+            name: entry.name,
+            path: entry.path,
+            size: entry.size,
+            modified: entry.modified
+          });
+        }
+        if (entry.children && entry.children.length > 0) {
+          processEntries(entry.children);
+        }
+      }
+    };
+
+    processEntries(logStructure);
+    res.write(`data: ${JSON.stringify(filesData)}\n\n`);
+  };
+
+  sendUpdate();
+
+  const intervalId = setInterval(sendUpdate, 10000);
+
+  req.on('close', () => {
+    clearInterval(intervalId);
+  });
 };
 
 const watcher = chokidar.watch(logsPath, {

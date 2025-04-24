@@ -1,0 +1,46 @@
+{
+  "name": "marmok-log-server",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "main": "build/logServer.js",
+  "scripts": {
+    "build": "tsc && npm run copy-assets",
+    "copy-assets": "mkdir -p build/views build/public && cp -r views/* build/views/ && cp -r public/* build/public/",
+    "dev": "nodemon --watch '*.ts' --exec \"node --no-warnings --loader ts-node/esm logServer.ts\"",
+    "start": "node build/logServer.js",
+    "watch": "nodemon -e ts,ejs --exec npm run dev",
+    "build:css": "tailwindcss -i ./styles.css -o ./public/css/style.css --minify"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.7.2",
+    "chokidar": "^4.0.3",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-basic-auth": "^1.2.1",
+    "express-ejs-layouts": "^2.5.1",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/typography": "^0.5.16",
+    "@types/chokidar": "^1.7.5",
+    "@types/express": "^5.0.1",
+    "@types/express-ejs-layouts": "^2.5.4",
+    "@types/lodash": "^4.17.16",
+    "@types/node": "^22.14.1",
+    "autoprefixer": "^10.4.16",
+    "copyfiles": "^2.4.1",
+    "nodemon": "^3.1.9",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.3.3",
+    "ts-node": "^10.9.2",
+    "typescript": "5.7.3"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=7.0.0"
+  }
+}

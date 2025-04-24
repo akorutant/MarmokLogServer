@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
+    <title>
+        <%= title %>
+    </title>
     <link rel="stylesheet" href="/assets/css/style.css">
     <link rel="stylesheet" href="/fonts/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -16,27 +19,32 @@
             margin: 0;
             padding: 0;
         }
+
         header {
             width: 100%;
         }
+
         main {
             flex: 1;
             width: 100%;
             padding: 1.5rem 0;
         }
+
         footer {
             width: 100%;
         }
+
         a {
             text-decoration: none;
         }
     </style>
 </head>
+
 <body class="bg-gray-100">
     <header>
-        <%- include('../partials/header') %> 
+        <%- include('../partials/header') %>
     </header>
-    
+
     <main>
         <div class="container mx-auto px-4">
             <%- body %>
@@ -46,7 +54,34 @@
     <footer>
         <%- include('../partials/footer') %>
     </footer>
-    
-    <script src="/assets/js/app.js"></script>
+
+    <script src="/assets/js/app.js">
+        window.addEventListener('DOMContentLoaded', function () {
+            setTimeout(function () {
+                // Создаем тестовую иконку для проверки
+                var testIcon = document.createElement('i');
+                testIcon.className = 'fas fa-check';
+                testIcon.style.visibility = 'hidden';
+                document.body.appendChild(testIcon);
+
+                // Проверяем, применились ли стили FontAwesome
+                var styles = window.getComputedStyle(testIcon);
+                var isFontAwesomeLoaded = styles.fontFamily.indexOf('Font Awesome') !== -1 ||
+                    styles.fontFamily.indexOf('FontAwesome') !== -1;
+
+                document.body.removeChild(testIcon);
+
+                // Если FontAwesome не загрузился, добавляем CDN версию
+                if (!isFontAwesomeLoaded) {
+                    console.log('FontAwesome not loaded, using CDN version...');
+                    var link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+                    document.head.appendChild(link);
+                }
+            }, 500); // Небольшая задержка для уверенности
+        });
+    </script>
 </body>
+
 </html>

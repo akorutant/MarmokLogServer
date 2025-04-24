@@ -14,6 +14,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Настройка кнопки копирования
+    checkFontAwesome();
+
     setupCopyButton();
     
     // Настройка SSE для обновления списка файлов в реальном времени
@@ -253,11 +255,12 @@ function setupServerSentEvents() {
     }
 }
 
-// Обновление списка логов из SSE
+// Функция для обновления списка логов с корректными иконками
 function updateLogsList(logs) {
     const logContainer = document.querySelector('.log-list') || document.querySelector('.space-y-2');
     if (!logContainer || !logs || !logs.length) return;
 
+    // Для таблицы (если она используется как контейнер)
     if (logContainer.tagName === 'TBODY') {
         logContainer.innerHTML = logs.map(file => `
       <tr class="log-entry">
@@ -289,12 +292,103 @@ function updateLogsList(logs) {
         </td>
       </tr>
     `).join('');
+    } 
+    // Для вложенной структуры (если используется древовидное представление)
+    else if (logContainer.classList.contains('space-y-2')) {
+        // Создадим временный контейнер для новых элементов
+        const tempContainer = document.createElement('div');
+        
+        // Отсортируем по каталогам сначала
+        const sortedLogs = [...logs].sort((a, b) => {
+            // Директории идут первыми
+            if (a.type === 'directory' && b.type !== 'directory') return -1;
+            if (a.type !== 'directory' && b.type === 'directory') return 1;
+            // Затем сортировка по имени
+            return a.name.localeCompare(b.name);
+        });
+        
+        // Создаем элементы для каждого файла
+        for (const file of sortedLogs) {
+            if (file.name.endsWith('.gz')) continue; // Пропускаем .gz файлы
+            
+            const entry = document.createElement('div');
+            entry.className = "log-entry";
+            
+            // Внутреннее содержимое зависит от типа (файл/директория)
+            if (file.type === 'file') {
+                entry.innerHTML = `
+                <div class="flex items-center p-2 hover:bg-gray-50 rounded">
+                    <i class="fas fa-file-alt text-blue-500 mr-2"></i>
+                    <span class="flex-1">${file.name}</span>
+                    <span class="text-sm text-gray-500 mr-4">
+                        ${file.size.toFixed(2)} KB
+                    </span>
+                    <span class="text-sm text-gray-500 mr-4">
+                        ${new Date(file.modified).toLocaleDateString('en-US', { 
+                            year: 'numeric', 
+                            month: 'short', 
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        })}
+                    </span>
+                    <a href="/logs/view?file=${encodeURIComponent(file.path)}" 
+                       class="text-blue-500 hover:text-blue-700 mr-2 p-2 rounded hover:bg-gray-100"
+                       title="View">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                    <a href="/logs/download?file=${encodeURIComponent(file.path)}" 
+                       class="text-green-500 hover:text-green-700 p-2 rounded hover:bg-gray-100"
+                       title="Download">
+                        <i class="fas fa-download"></i>
+                    </a>
+                </div>
+                `;
+            } else {
+                // Для директорий (если понадобится)
+                entry.innerHTML = `
+                <div class="flex items-center p-2 hover:bg-gray-50 rounded font-bold">
+                    <i class="fas fa-folder text-yellow-500 mr-2"></i>
+                    <span class="flex-1">${file.name}</span>
+                </div>
+                `;
+                // Здесь можно добавить рекурсивное построение дерева, если нужно
+            }
+            
+            tempContainer.appendChild(entry);
+        }
+        
+        // Заменяем содержимое контейнера
+        logContainer.innerHTML = tempContainer.innerHTML;
     }
 
     // Анимируем новые элементы
     document.querySelectorAll('.log-entry').forEach((entry, index) => {
         entry.style.animationDelay = `${index * 0.03}s`;
     });
+}
+
+// Добавьте эту функцию для проверки состояния FontAwesome
+function checkFontAwesome() {
+    // Проверяем, загрузился ли FontAwesome
+    const testIcon = document.createElement('i');
+    testIcon.className = 'fas fa-check';
+    document.body.appendChild(testIcon);
+    
+    const computed = window.getComputedStyle(testIcon);
+    const isFontAwesomeLoaded = computed.fontFamily.includes('Font Awesome') || 
+                              computed.fontFamily.includes('FontAwesome');
+    
+    document.body.removeChild(testIcon);
+    
+    // Если FontAwesome не загрузился, попробуем загрузить его через CDN
+    if (!isFontAwesomeLoaded) {
+        console.warn('FontAwesome not loaded, attempting to load from CDN...');
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+        document.head.appendChild(link);
+    }
 }
 
 // Функция фильтрации .gz файлов при загрузке страницы

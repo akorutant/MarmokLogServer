@@ -6,16 +6,21 @@
     <title><%= title %></title>
     <link rel="stylesheet" href="/assets/css/style.css">
     
-    <!-- Try multiple FontAwesome sources -->
+    <!-- FontAwesome с резервными вариантами -->
     <link rel="stylesheet" href="/assets/fontawesome/css/all.min.css" onerror="this.onerror=null;this.href='/fonts/css/all.min.css';">
-    <!-- CDN Fallback if local files fail -->
     <script>
-      (function() {
-        var link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
-        document.head.appendChild(link);
-      })();
+      // CDN Fallback для FontAwesome
+      document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+          // Проверяем, загрузился ли FontAwesome
+          if (getComputedStyle(document.querySelector('head')).fontFamily.indexOf('FontAwesome') === -1) {
+            var link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+            document.head.appendChild(link);
+          }
+        }, 500);
+      });
     </script>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -27,66 +32,43 @@
             min-height: 100vh;
             margin: 0;
             padding: 0;
+            padding-bottom: env(safe-area-inset-bottom, 0);
         }
+        
+        /* Базовые стили для всех устройств */
         header {
             width: 100%;
         }
+        
         main {
             flex: 1;
             width: 100%;
             padding: 1rem 0;
         }
+        
         footer {
             width: 100%;
         }
+        
         a {
             text-decoration: none;
         }
         
-        /* Мобильные стили */
+        /* Добавляем отступ внизу для мобильных устройств с панелью навигации */
         @media (max-width: 768px) {
-            .container {
-                padding-left: 0.5rem;
-                padding-right: 0.5rem;
+            main {
+                padding-bottom: 70px;
             }
             
-            /* Стили для мобильного меню */
-            .mobile-menu-toggle {
-                display: block;
-            }
-            
-            .mobile-hidden {
-                display: none;
-            }
-            
-            /* Адаптация размеров шрифтов */
-            h1 {
-                font-size: 1.5rem !important;
-            }
-            
-            /* Уменьшаем отступы */
-            .p-6 {
-                padding: 0.75rem !important;
-            }
-            
-            .px-6 {
-                padding-left: 0.75rem !important;
-                padding-right: 0.75rem !important;
-            }
-            
-            /* Улучшение взаимодействия с сенсорными устройствами */
-            button, a {
-                min-height: 44px;
-                min-width: 44px;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-            }
-            
-            /* Улучшенные сенсорные цели для таблицы */
-            td, th {
-                padding-top: 0.75rem !important;
-                padding-bottom: 0.75rem !important;
+            /* Адаптация для разных мобильных устройств */
+            @supports (padding-bottom: env(safe-area-inset-bottom)) {
+                main {
+                    padding-bottom: calc(70px + env(safe-area-inset-bottom));
+                }
+                
+                .fixed {
+                    padding-bottom: env(safe-area-inset-bottom);
+                }
             }
         }
     </style>
@@ -107,26 +89,5 @@
     </footer>
     
     <script src="/assets/js/app.js"></script>
-    
-    <!-- Скрипт для мобильной адаптации -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Проверяем размер экрана
-            const isMobile = window.innerWidth < 768;
-            
-            // Адаптация для мобильных устройств
-            if (isMobile) {
-                // Адаптируем таблицы для мобильных
-                document.querySelectorAll('table').forEach(table => {
-                    table.classList.add('mobile-table');
-                });
-                
-                // Увеличиваем область нажатия для ссылок
-                document.querySelectorAll('a, button').forEach(elem => {
-                    elem.classList.add('touch-target');
-                });
-            }
-        });
-    </script>
 </body>
 </html>

@@ -171,6 +171,7 @@ function setupServer() {
     });
   });
 
+
   app.use(expressLayouts);
 
   app.set('views', join(__dirname, 'views'));

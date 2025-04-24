@@ -1,8 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
-    "./**/*.{js,ts,html}",
-    "./views/**/*.ejs"
+    "./views/**/*.ejs",
+    "./public/js/**/*.js"
   ],
   theme: {
     extend: {
@@ -24,23 +24,7 @@ export default {
           '0%': { opacity: 0, transform: 'translateY(-10px)' },
           '100%': { opacity: 1, transform: 'translateY(0)' }
         }
-      }
-    },
-  },
-  darkMode: 'class',
-  plugins: [
-    require('@tailwindcss/forms'),
-    require('@tailwindcss/typography')
-  ],
-}
-
-module.exports = {
-  content: [
-    "./views/**/*.ejs",
-    "./public/js/**/*.js"
-  ],
-  theme: {
-    extend: {
+      },
       spacing: {
         '128': '32rem'
       },
@@ -49,7 +33,9 @@ module.exports = {
       }
     },
   },
+  darkMode: 'class',
   plugins: [
+    require('@tailwindcss/forms'),
     require('@tailwindcss/typography')
-  ]
+  ],
 }

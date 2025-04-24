@@ -15,7 +15,6 @@ import os from 'os';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const _require = createRequire(import.meta.url);
-const domain = process.env.DOMAIN;
 
 config();
 
@@ -305,7 +304,8 @@ function setupServer() {
 function startServer() {
   const app = setupServer();
   const port = Number(process.env.LOG_PORT) || 3001;
-  
+  const domain = process.env.DOMAIN;
+
   // Check if SSL certificates are provided
   if (process.env.SSL_KEY_PATH && process.env.SSL_CERT_PATH) {
     try {
@@ -334,6 +334,7 @@ function startServer() {
 }
 
 function startHttpServer(app: express.Express, port: number) {
+  const domain = process.env.DOMAIN;
   app.listen(port, '0.0.0.0', () => {
     console.log(`📋 HTTP Log dashboard running at http://0.0.0.0:${port}/logs`);
     console.log(`📋 HTTP Log dashboard available at http://${domain}:${port}/logs`);

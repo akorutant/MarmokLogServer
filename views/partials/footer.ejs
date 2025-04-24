@@ -1,5 +1,6 @@
-<footer class="mt-8 border-t border-gray-200">
-    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+<footer class="mt-4 md:mt-8 border-t border-gray-200">
+    <!-- Десктопный футер -->
+    <div class="container mx-auto px-4 py-4 hidden md:flex justify-between items-center">
         <div class="text-sm text-gray-500">
             © 2024 MarmokBot Logs Manager. v1.0.0
         </div>
@@ -13,6 +14,26 @@
             <span class="text-gray-500">
                 <i class="fas fa-circle text-green-500 animate-pulse mr-1"></i>Server status: Online
             </span>
+        </div>
+    </div>
+    
+    <!-- Мобильный футер -->
+    <div class="md:hidden container mx-auto px-4 py-3">
+        <div class="flex flex-col items-center text-center">
+            <div class="text-xs text-gray-500 mb-2">
+                © 2024 MarmokBot Logs Manager
+            </div>
+            <div class="flex space-x-4 mb-1">
+                <a href="/docs" class="text-gray-500 hover:text-blue-600 transition-colors text-sm">
+                    <i class="fas fa-book"></i>
+                </a>
+                <a href="https://github.com/akorutant/MarmokBot" target="_blank" class="text-gray-500 hover:text-blue-600 transition-colors text-sm">
+                    <i class="fab fa-github"></i>
+                </a>
+                <span class="text-gray-500 text-sm">
+                    <i class="fas fa-circle text-green-500 animate-pulse"></i>
+                </span>
+            </div>
         </div>
     </div>
 </footer>

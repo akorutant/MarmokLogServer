@@ -2,18 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title><%= title %></title>
     <link rel="stylesheet" href="/assets/css/style.css">
+    
+    <!-- Try multiple FontAwesome sources -->
     <link rel="stylesheet" href="/assets/fontawesome/css/all.min.css" onerror="this.onerror=null;this.href='/fonts/css/all.min.css';">
+    <!-- CDN Fallback if local files fail -->
     <script>
       (function() {
         var link = document.createElement('link');
         link.rel = 'stylesheet';
         link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
-        link.onerror = function() {
-          console.error('Failed to load FontAwesome from CDN');
-        };
         document.head.appendChild(link);
       })();
     </script>
@@ -34,7 +34,7 @@
         main {
             flex: 1;
             width: 100%;
-            padding: 1.5rem 0;
+            padding: 1rem 0;
         }
         footer {
             width: 100%;
@@ -42,13 +42,52 @@
         a {
             text-decoration: none;
         }
-        /* Basic icon fallbacks in case FontAwesome fails */
-        .icon-fallback-text {
-            display: inline-block;
-        }
-        .icon-fallback-text::before {
-            content: attr(data-icon);
-            margin-right: 5px;
+        
+        /* Мобильные стили */
+        @media (max-width: 768px) {
+            .container {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+            
+            /* Стили для мобильного меню */
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .mobile-hidden {
+                display: none;
+            }
+            
+            /* Адаптация размеров шрифтов */
+            h1 {
+                font-size: 1.5rem !important;
+            }
+            
+            /* Уменьшаем отступы */
+            .p-6 {
+                padding: 0.75rem !important;
+            }
+            
+            .px-6 {
+                padding-left: 0.75rem !important;
+                padding-right: 0.75rem !important;
+            }
+            
+            /* Улучшение взаимодействия с сенсорными устройствами */
+            button, a {
+                min-height: 44px;
+                min-width: 44px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            /* Улучшенные сенсорные цели для таблицы */
+            td, th {
+                padding-top: 0.75rem !important;
+                padding-bottom: 0.75rem !important;
+            }
         }
     </style>
 </head>
@@ -68,5 +107,26 @@
     </footer>
     
     <script src="/assets/js/app.js"></script>
+    
+    <!-- Скрипт для мобильной адаптации -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Проверяем размер экрана
+            const isMobile = window.innerWidth < 768;
+            
+            // Адаптация для мобильных устройств
+            if (isMobile) {
+                // Адаптируем таблицы для мобильных
+                document.querySelectorAll('table').forEach(table => {
+                    table.classList.add('mobile-table');
+                });
+                
+                // Увеличиваем область нажатия для ссылок
+                document.querySelectorAll('a, button').forEach(elem => {
+                    elem.classList.add('touch-target');
+                });
+            }
+        });
+    </script>
 </body>
 </html>

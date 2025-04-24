@@ -1,35 +1,45 @@
-<div class="bg-white rounded-lg shadow-md p-6">
-    <h1 class="text-2xl font-bold mb-4 text-gray-800">
+<div class="bg-white rounded-lg shadow-md p-4 md:p-6">
+    <h1 class="text-xl md:text-2xl font-bold mb-4 text-gray-800 flex items-center">
         <i class="fas fa-file-alt mr-2 text-blue-500"></i>
-        <%= title %>
+        <span class="truncate"><%= title %></span>
     </h1>
 
     <div class="mb-4">
         <div class="bg-gray-50 rounded-lg p-2 flex justify-between items-center">
-            <div class="text-sm">
+            <div class="text-sm hidden md:block">
                 <span class="mr-4"><i class="fas fa-info-circle text-blue-500 mr-1"></i> Log file content</span>
             </div>
-            <div>
+            <div class="w-full md:w-auto flex justify-end">
                 <button id="copyBtn" class="text-sm px-3 py-1 bg-gray-100 text-gray-600 rounded hover:bg-gray-200">
-                    <i class="fas fa-copy mr-1"></i> Copy to clipboard
+                    <i class="fas fa-copy mr-1"></i> <span class="hidden md:inline">Copy to clipboard</span><span class="md:hidden">Copy</span>
                 </button>
             </div>
         </div>
     </div>
 
     <div id="logContent"
-        class="bg-gray-50 rounded p-4 font-mono text-sm overflow-x-auto max-h-[70vh] overflow-y-auto border border-gray-200">
+        class="bg-gray-50 rounded p-2 md:p-4 font-mono text-xs md:text-sm overflow-x-auto max-h-[60vh] md:max-h-[70vh] overflow-y-auto border border-gray-200">
         <pre><%= content %></pre>
     </div>
 
     <div class="mt-4 flex justify-between">
         <a href="/logs" class="text-blue-500 hover:text-blue-700 flex items-center">
-            <i class="fas fa-arrow-left mr-2"></i>Back to list
+            <i class="fas fa-arrow-left mr-2"></i><span class="hidden md:inline">Back to list</span><span class="md:hidden">Back</span>
         </a>
+        
+        <!-- Мобильные дополнительные действия -->
+        <div class="flex space-x-2 md:hidden">
+            <button id="increaseFont" class="text-gray-600 p-1 rounded hover:bg-gray-100">
+                <i class="fas fa-search-plus"></i>
+            </button>
+            <button id="decreaseFont" class="text-gray-600 p-1 rounded hover:bg-gray-100">
+                <i class="fas fa-search-minus"></i>
+            </button>
+        </div>
     </div>
 
     <script>
-
+        // Функция для выделения JSON в логах
         function colorizeLogContent() {
             const logContent = document.getElementById('logContent');
             const preElement = logContent.querySelector('pre');
@@ -79,7 +89,7 @@
             navigator.clipboard.writeText(content).then(() => {
                 const btn = this;
                 const originalText = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check mr-1"></i> Copied!';
+                btn.innerHTML = '<i class="fas fa-check mr-1"></i> <span class="hidden md:inline">Copied!</span><span class="md:hidden">✓</span>';
                 btn.classList.add('bg-green-100', 'text-green-700');
                 setTimeout(() => {
                     btn.innerHTML = originalText;
@@ -88,6 +98,368 @@
             });
         });
 
-        document.addEventListener('DOMContentLoaded', colorizeLogContent);
-    </script>
-</div>
+        document.addEventListener('DOMContentLoaded', function() {
+    // Определяем, мобильное ли устройство
+    const isMobile = window.innerWidth < 768;
+    
+    // Настройка темной темы
+    setupThemeToggle();
+    
+    // Настройка поиска
+    setupSearch();
+    
+    // Анимация элементов логов
+    animateLogEntries();
+    
+    // Сортировка таблиц (если есть)
+    setupTableSorting();
+    
+    // Дополнительные настройки для мобильных устройств
+    if (isMobile) {
+        setupMobileEnhancements();
+    }
+    
+    // Настройка отображения JSON в логах
+    highlightJson();
+    
+    // Настройка серверного события для обновления данных
+    setupServerSentEvents();
+});
+
+function setupThemeToggle() {
+    const themeToggle = document.getElementById('themeToggle');
+    const themeToggleMobile = document.getElementById('themeToggleMobile');
+    const mobileThemeBtn = document.getElementById('mobile-theme-btn');
+    const body = document.body;
+    
+    // Загружаем тему из localStorage
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    body.classList.toggle('dark-mode', currentTheme === 'dark');
+    
+    // Обновляем все кнопки темы
+    updateAllThemeIcons(currentTheme === 'dark');
+    
+    // Добавляем обработчики событий на все кнопки темы
+    [themeToggle, themeToggleMobile, mobileThemeBtn].forEach(button => {
+        if (button) {
+            button.addEventListener('click', function() {
+                const isDark = body.classList.toggle('dark-mode');
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                updateAllThemeIcons(isDark);
+            });
+        }
+    });
+}
+
+function updateAllThemeIcons(isDark) {
+    const themeToggle = document.getElementById('themeToggle');
+    const themeToggleMobile = document.getElementById('themeToggleMobile');
+    const mobileThemeBtn = document.getElementById('mobile-theme-btn');
+    
+    if (themeToggle) {
+        themeToggle.innerHTML = isDark
+            ? '<i class="fas fa-sun text-yellow-500"></i>'
+            : '<i class="fas fa-moon text-gray-600"></i>';
+    }
+    
+    if (themeToggleMobile) {
+        themeToggleMobile.innerHTML = isDark
+            ? '<i class="fas fa-sun text-yellow-500"></i>'
+            : '<i class="fas fa-moon text-gray-600"></i>';
+    }
+    
+    if (mobileThemeBtn) {
+        const icon = mobileThemeBtn.querySelector('i');
+        if (icon) {
+            icon.className = isDark 
+                ? 'fas fa-sun text-xl text-yellow-500' 
+                : 'fas fa-moon text-xl text-gray-600';
+        }
+    }
+}
+
+function setupSearch() {
+    const searchInput = document.getElementById('searchInput');
+    const searchInputMobile = document.getElementById('searchInputMobile');
+    const mobileSearchToggle = document.getElementById('mobile-search-toggle');
+    const mobileSearch = document.getElementById('mobile-search');
+    const mobileSearchBtn = document.getElementById('mobile-search-btn');
+    
+    // Настройка функции поиска
+    function filterLogEntries(searchTerm) {
+        searchTerm = searchTerm.toLowerCase();
+        document.querySelectorAll('.log-entry').forEach(entry => {
+            const text = entry.textContent.toLowerCase();
+            const isMatch = text.includes(searchTerm);
+            entry.style.display = isMatch ? '' : 'none';
+        });
+    }
+    
+    // Синхронизация двух полей поиска
+    if (searchInput && searchInputMobile) {
+        searchInput.addEventListener('input', function() {
+            searchInputMobile.value = this.value;
+            filterLogEntries(this.value);
+        });
+        
+        searchInputMobile.addEventListener('input', function() {
+            searchInput.value = this.value;
+            filterLogEntries(this.value);
+        });
+    } else if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            filterLogEntries(this.value);
+        });
+    } else if (searchInputMobile) {
+        searchInputMobile.addEventListener('input', function() {
+            filterLogEntries(this.value);
+        });
+    }
+    
+    // Настройка переключателя мобильного поиска
+    if (mobileSearchToggle && mobileSearch) {
+        mobileSearchToggle.addEventListener('click', function() {
+            mobileSearch.classList.toggle('hidden');
+            if (!mobileSearch.classList.contains('hidden')) {
+                searchInputMobile.focus();
+            }
+        });
+    }
+    
+    // Настройка кнопки поиска в мобильной нижней панели
+    if (mobileSearchBtn && mobileSearchToggle) {
+        mobileSearchBtn.addEventListener('click', function() {
+            mobileSearchToggle.click();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+}
+
+function animateLogEntries() {
+    const entries = document.querySelectorAll('.log-entry');
+    entries.forEach((entry, index) => {
+        // Уменьшаем задержку на мобильных устройствах для более быстрой анимации
+        const delay = window.innerWidth < 768 ? index * 0.02 : index * 0.05;
+        entry.style.animationDelay = `${delay}s`;
+    });
+}
+
+function setupTableSorting() {
+    document.querySelectorAll('th[data-sort]').forEach(header => {
+        header.addEventListener('click', () => {
+            const tbody = document.querySelector('tbody');
+            if (!tbody) return;
+
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const sortKey = header.dataset.sort;
+            const isAsc = header.classList.toggle('asc');
+
+            rows.sort((a, b) => {
+                const aVal = getSortValue(a, sortKey);
+                const bVal = getSortValue(b, sortKey);
+                return isAsc ? aVal - bVal : bVal - aVal;
+            });
+
+            rows.forEach(row => tbody.appendChild(row));
+            updateSortIndicators(header);
+        });
+    });
+}
+
+function getSortValue(row, key) {
+    switch (key) {
+        case 'size':
+            return parseFloat(row.cells[1].textContent);
+        case 'date':
+            return new Date(row.cells[2].textContent).getTime();
+        default:
+            return row.cells[0].textContent.toLowerCase();
+    }
+}
+
+function updateSortIndicators(sortedHeader) {
+    document.querySelectorAll('th').forEach(header => {
+        header.classList.remove('asc', 'desc');
+        const indicator = header.querySelector('.sort-indicator');
+        if (indicator) indicator.remove();
+    });
+
+    const icon = document.createElement('i');
+    icon.className = `sort-indicator fas fa-arrow-${sortedHeader.classList.contains('asc') ? 'up' : 'down'} ml-2`;
+    sortedHeader.appendChild(icon);
+}
+
+function setupMobileEnhancements() {
+    // Увеличиваем область тача для элементов управления
+    document.querySelectorAll('a, button').forEach(elem => {
+        if (!elem.classList.contains('log-entry') && elem.clientHeight < 40) {
+            elem.style.minHeight = '40px';
+            elem.style.display = 'inline-flex';
+            elem.style.alignItems = 'center';
+            elem.style.justifyContent = 'center';
+        }
+    });
+    
+    // Добавляем обработчики свайпов для удобства навигации
+    setupSwipeNavigation();
+    
+    // Настраиваем отображение таблиц на мобильных устройствах
+    document.querySelectorAll('table').forEach(table => {
+        table.classList.add('mobile-table');
+    });
+}
+
+function setupSwipeNavigation() {
+    // Реализация свайпа влево/вправо для навигации
+    let touchStartX = 0;
+    let touchEndX = 0;
+    
+    document.addEventListener('touchstart', function(e) {
+        touchStartX = e.changedTouches[0].screenX;
+    }, false);
+    
+    document.addEventListener('touchend', function(e) {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    }, false);
+    
+    function handleSwipe() {
+        const threshold = 100;
+        const swipeDistance = touchEndX - touchStartX;
+        
+        // Свайп вправо для возврата назад
+        if (swipeDistance > threshold) {
+            const backButton = document.querySelector('a[href="/logs"]');
+            if (backButton && window.location.pathname !== '/logs') {
+                backButton.click();
+            }
+        }
+    }
+}
+
+function highlightJson() {
+    const logContent = document.querySelector('#logContent pre');
+    if (!logContent) return;
+
+    const content = logContent.textContent;
+    
+    try {
+        const highlighted = content.replace(/(\{.*?\})/g, match => {
+            try {
+                const json = JSON.parse(match);
+                const levelClass = json.level === 'error' ? 'text-red-600 font-bold' :
+                    json.level === 'warn' ? 'text-yellow-600' :
+                        json.level === 'info' ? 'text-blue-600' : '';
+
+                let html = '<span class="json-block p-1 border-b border-gray-200 block">';
+                
+                if (json.level) {
+                    html += `<span class="${levelClass}">[${json.level.toUpperCase()}]</span> `;
+                }
+                
+                if (json.timestamp) {
+                    html += `<span class="text-purple-600">${json.timestamp}</span> `;
+                }
+                
+                if (json.message) {
+                    html += `<span>${json.message}</span>`;
+                }
+                
+                html += '</span>';
+                return html;
+            } catch (e) {
+                return match;
+            }
+        });
+
+        if (highlighted !== content) {
+            logContent.innerHTML = highlighted;
+        }
+    } catch (e) {
+        console.error('Error highlighting JSON:', e);
+    }
+}
+
+function updateLogsList(logs) {
+    const logContainer = document.querySelector('.log-list') || document.querySelector('.space-y-2');
+    if (!logContainer || !logs || !logs.length) return;
+
+    if (logContainer.tagName === 'TBODY') {
+        // Формат для мобильных устройств - упрощенный
+        if (window.innerWidth < 768) {
+            logContainer.innerHTML = logs.map(file => `
+                <tr class="log-entry">
+                    <td class="px-2 py-3 whitespace-nowrap">
+                        <i class="fas fa-file-code text-blue-500 mr-1"></i>
+                        ${file.name}
+                    </td>
+                    <td class="px-2 py-3 whitespace-nowrap">
+                        <a href="/logs/view?file=${encodeURIComponent(file.path)}" 
+                           class="text-blue-500 hover:text-blue-700 mr-2 p-2">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="/logs/download?file=${encodeURIComponent(file.path)}" 
+                           class="text-green-500 hover:text-green-700 p-2">
+                            <i class="fas fa-download"></i>
+                        </a>
+                    </td>
+                </tr>
+            `).join('');
+        } else {
+            // Полный формат для десктопов
+            logContainer.innerHTML = logs.map(file => `
+                <tr class="log-entry">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <i class="fas fa-file-code text-blue-500 mr-2"></i>
+                        ${file.name}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        ${file.size.toFixed(2)} KB
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        ${new Date(file.modified).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        })}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <a href="/logs/view?file=${encodeURIComponent(file.path)}" 
+                           class="text-blue-500 hover:text-blue-700 mr-4">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="/logs/download?file=${encodeURIComponent(file.path)}" 
+                           class="text-green-500 hover:text-green-700">
+                            <i class="fas fa-download"></i>
+                        </a>
+                    </td>
+                </tr>
+            `).join('');
+        }
+    }
+
+    animateLogEntries();
+}
+
+function setupServerSentEvents() {
+    if (window.location.pathname === '/logs') {
+        const eventSource = new EventSource('/logs/stream');
+        
+        eventSource.onmessage = function(event) {
+            const filesData = JSON.parse(event.data);
+            console.log('Received update:', filesData.length + ' files');
+            updateLogsList(filesData);
+        };
+        
+        eventSource.onerror = function() {
+            console.error('SSE connection error');
+            eventSource.close();
+        };
+        
+        window.addEventListener('beforeunload', function() {
+            eventSource.close();
+        });
+    }
+}

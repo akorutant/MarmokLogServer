@@ -1,100 +1,38 @@
 <header class="bg-white shadow-sm">
     <nav class="container mx-auto px-4 py-3">
         <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-4">
-                <a href="/logs" class="flex items-center">
-                    <i class="fas fa-terminal text-xl md:text-2xl text-blue-600"></i>
-                    <span class="ml-2 text-lg md:text-xl font-bold text-gray-800">MarmokBot Logs</span>
-                </a>
-                <div class="text-sm bg-gray-100 px-3 py-1 rounded-full hidden md:block">
-                    <i class="fas fa-server text-blue-500 mr-1"></i>
-                    <span id="currentTime">Loading...</span>
-                </div>
-            </div>
+            <a href="/logs" class="flex items-center">
+                <i class="fas fa-terminal text-xl text-blue-600"></i>
+                <span class="ml-2 text-lg font-bold text-gray-800">MarmokBot Logs</span>
+            </a>
             
-            <div class="flex items-center space-x-2 md:space-x-4">
-                <!-- Мобильный поиск (кнопка) -->
-                <button id="mobile-search-toggle" class="p-2 md:hidden">
-                    <i class="fas fa-search text-gray-600"></i>
-                </button>
-                
-                <!-- Десктопный поиск (всегда видимый) -->
-                <div class="relative hidden md:block">
+            <div class="flex items-center space-x-3">
+                <div class="relative hidden md:block w-60">
                     <input type="search" 
                            id="searchInput" 
                            placeholder="Search logs..." 
-                           class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                           class="w-full pl-8 pr-3 py-1 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <i class="fas fa-search absolute left-2 top-2 text-gray-400 text-sm"></i>
                 </div>
                 
-                <!-- Кнопка темной темы (для всех устройств) -->
-                <button id="themeToggle" class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                    <i class="fas fa-moon text-gray-600"></i>
+                <button id="mobileSearchBtn" class="p-2 md:hidden text-gray-600">
+                    <i class="fas fa-search"></i>
+                </button>
+                
+                <button id="themeToggle" class="p-2 text-gray-600">
+                    <i class="fas fa-moon"></i>
                 </button>
             </div>
         </div>
         
-        <!-- Мобильная строка поиска (изначально скрыта) -->
-        <div id="mobile-search" class="mt-2 hidden md:hidden">
-            <div class="relative w-full">
+        <div id="mobileSearchContainer" class="mt-2 hidden">
+            <div class="relative">
                 <input type="search" 
-                       id="searchInputMobile" 
+                       id="mobileSearchInput" 
                        placeholder="Search logs..." 
-                       class="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                       class="w-full pl-8 pr-3 py-2 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <i class="fas fa-search absolute left-2 top-2 text-gray-400 text-sm"></i>
             </div>
         </div>
     </nav>
-    <script>
-        function updateTime() {
-            const now = new Date();
-            const options = { 
-                weekday: 'short',
-                year: 'numeric', 
-                month: 'short', 
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            };
-            
-            const mobileOptions = {
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            };
-            
-            const timeElement = document.getElementById('currentTime');
-            if (timeElement) {
-                // Используем более короткий формат для мобильных устройств
-                if (window.innerWidth < 768) {
-                    timeElement.textContent = now.toLocaleDateString('en-US', mobileOptions);
-                } else {
-                    timeElement.textContent = now.toLocaleDateString('en-US', options);
-                }
-            }
-        }
-        
-        // Инициализация времени
-        updateTime();
-        setInterval(updateTime, 1000);
-        
-        // Обработчик для мобильного поиска
-        document.addEventListener('DOMContentLoaded', function() {
-            const mobileSearchToggle = document.getElementById('mobile-search-toggle');
-            const mobileSearch = document.getElementById('mobile-search');
-            
-            if (mobileSearchToggle && mobileSearch) {
-                mobileSearchToggle.addEventListener('click', function() {
-                    mobileSearch.classList.toggle('hidden');
-                    
-                    // Фокус на поле ввода при открытии
-                    if (!mobileSearch.classList.contains('hidden')) {
-                        document.getElementById('searchInputMobile').focus();
-                    }
-                });
-            }
-        });
-    </script>
 </header>

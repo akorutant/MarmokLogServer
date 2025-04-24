@@ -1,70 +1,39 @@
-<footer class="mt-4 md:mt-8 border-t border-gray-200">
-    <div class="container mx-auto px-4 py-4">
+<footer class="mt-4 border-t border-gray-200">
+    <div class="container mx-auto px-4 py-3">
         <div class="flex flex-col md:flex-row justify-between items-center">
-            <div class="text-xs md:text-sm text-gray-500 mb-2 md:mb-0 text-center md:text-left">
-                © 2024 MarmokBot Logs Manager. v1.0.0
+            <div class="text-xs text-gray-500 mb-2 md:mb-0 text-center md:text-left">
+                © 2024 MarmokBot Logs Manager
             </div>
-            <div class="flex flex-wrap justify-center space-x-4">
-                <a href="/docs" class="text-gray-500 hover:text-blue-600 transition-colors text-sm">
-                    <i class="fas fa-book mr-1"></i><span class="hidden md:inline">Documentation</span>
-                </a>
-                <a href="https://github.com/akorutant/MarmokBot" target="_blank" class="text-gray-500 hover:text-blue-600 transition-colors text-sm">
-                    <i class="fab fa-github mr-1"></i><span class="hidden md:inline">GitHub</span>
+            
+            <div class="flex space-x-4">
+                <a href="https://github.com/akorutant/MarmokBot" target="_blank" class="text-gray-500 hover:text-blue-600 text-sm">
+                    <i class="fab fa-github"></i>
+                    <span class="ml-1 hidden md:inline">GitHub</span>
                 </a>
                 <span class="text-gray-500 text-sm">
-                    <i class="fas fa-circle text-green-500 animate-pulse mr-1"></i><span class="hidden md:inline">Server status: Online</span>
+                    <i class="fas fa-circle text-green-500 animate-pulse"></i>
+                    <span class="ml-1 hidden md:inline">Server Online</span>
                 </span>
             </div>
         </div>
     </div>
     
-    <!-- Мобильная панель быстрого доступа -->
-    <div class="fixed bottom-0 left-0 right-0 md:hidden bg-white shadow-lg border-t border-gray-200 py-2 px-4 flex justify-around z-10">
-        <a href="/logs" class="flex flex-col items-center text-blue-500">
-            <i class="fas fa-home text-xl"></i>
-            <span class="text-xs mt-1">Home</span>
-        </a>
-        <button id="mobile-search-btn" class="flex flex-col items-center text-gray-600">
-            <i class="fas fa-search text-xl"></i>
-            <span class="text-xs mt-1">Search</span>
-        </button>
-        <button id="mobile-theme-btn" class="flex flex-col items-center text-gray-600">
-            <i class="fas fa-moon text-xl"></i>
-            <span class="text-xs mt-1">Theme</span>
-        </button>
+    <div id="mobileNavBar" class="fixed bottom-0 left-0 right-0 md:hidden bg-white shadow-lg border-t border-gray-200 py-2 z-10">
+        <div class="flex justify-around">
+            <a href="/logs" class="flex flex-col items-center text-gray-700">
+                <i class="fas fa-home"></i>
+                <span class="text-xs mt-1">Home</span>
+            </a>
+            
+            <button id="navSearchBtn" class="flex flex-col items-center text-gray-700">
+                <i class="fas fa-search"></i>
+                <span class="text-xs mt-1">Search</span>
+            </button>
+            
+            <button id="navThemeBtn" class="flex flex-col items-center text-gray-700">
+                <i class="fas fa-moon"></i>
+                <span class="text-xs mt-1">Theme</span>
+            </button>
+        </div>
     </div>
 </footer>
-
-<script>
-    // Обработчики для мобильной панели
-    document.addEventListener('DOMContentLoaded', function() {
-        const mobileSearchBtn = document.getElementById('mobile-search-btn');
-        const mobileThemeBtn = document.getElementById('mobile-theme-btn');
-        
-        if (mobileSearchBtn) {
-            mobileSearchBtn.addEventListener('click', function() {
-                // Эмулируем клик на кнопку поиска в хедере
-                const searchToggle = document.getElementById('mobile-search-toggle');
-                if (searchToggle) {
-                    searchToggle.click();
-                }
-                
-                // Прокручиваем к хедеру для удобства поиска
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-            });
-        }
-        
-        if (mobileThemeBtn) {
-            mobileThemeBtn.addEventListener('click', function() {
-                // Переключаем тему
-                const themeToggle = document.getElementById('themeToggle');
-                if (themeToggle) {
-                    themeToggle.click();
-                }
-            });
-        }
-    });
-</script>

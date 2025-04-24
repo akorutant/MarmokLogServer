@@ -178,6 +178,8 @@ function setupServer() {
   app.use('/assets/css', express.static(join(__dirname, 'public/css')));
   app.use('/assets/js', express.static(join(__dirname, 'public/js')));
   app.use('/assets/fonts', express.static(join(__dirname, 'assets/fonts')));
+  app.set('views', join(process.cwd(), 'views'));
+  app.set('view engine', 'ejs'); 
   app.use('/fonts', express.static(join(__dirname, 'node_modules/@fortawesome/fontawesome-free')));
 
   // Redirect root to logs page

@@ -5,7 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
     <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/fonts/css/all.min.css">
+    <link rel="stylesheet" href="/assets/fontawesome/css/all.min.css" onerror="this.onerror=null;this.href='/fonts/css/all.min.css';">
+    <script>
+      (function() {
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+        link.onerror = function() {
+          console.error('Failed to load FontAwesome from CDN');
+        };
+        document.head.appendChild(link);
+      })();
+    </script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -29,6 +41,14 @@
         }
         a {
             text-decoration: none;
+        }
+        /* Basic icon fallbacks in case FontAwesome fails */
+        .icon-fallback-text {
+            display: inline-block;
+        }
+        .icon-fallback-text::before {
+            content: attr(data-icon);
+            margin-right: 5px;
         }
     </style>
 </head>

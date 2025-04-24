@@ -177,13 +177,43 @@ function setupServer() {
   app.use('/assets/js', express.static(join(__dirname, 'public/js')));
   app.use('/assets/fonts', express.static(join(__dirname, 'assets/fonts')));
   
+  // Serve local FontAwesome if available
+  app.use('/assets/fontawesome', express.static(join(__dirname, 'public/fontawesome')));
+  
   // Fix view paths 
   app.set('views', join(__dirname, 'views'));
   app.set('view engine', 'ejs');
   
-  // Fix fontawesome path
-  const nodemodulesPath = path.resolve(__dirname, 'node_modules');
-  app.use('/fonts', express.static(join(nodemodulesPath, '@fortawesome/fontawesome-free')));
+  // Backup FontAwesome path from node_modules (with proper MIME types)
+  try {
+    const nodemodulesPath = path.resolve(__dirname, 'node_modules');
+    const fontAwesomePath = join(nodemodulesPath, '@fortawesome/fontawesome-free');
+    
+    if (fs.existsSync(fontAwesomePath)) {
+      app.use('/fonts', express.static(fontAwesomePath, {
+        setHeaders: (res, filePath) => {
+          if (filePath.endsWith('.css')) {
+            res.setHeader('Content-Type', 'text/css');
+          } else if (filePath.endsWith('.woff')) {
+            res.setHeader('Content-Type', 'application/font-woff');
+          } else if (filePath.endsWith('.woff2')) {
+            res.setHeader('Content-Type', 'application/font-woff2');
+          } else if (filePath.endsWith('.ttf')) {
+            res.setHeader('Content-Type', 'application/x-font-ttf');
+          } else if (filePath.endsWith('.eot')) {
+            res.setHeader('Content-Type', 'application/vnd.ms-fontobject');
+          } else if (filePath.endsWith('.svg')) {
+            res.setHeader('Content-Type', 'image/svg+xml');
+          }
+        }
+      }));
+      console.log("Serving FontAwesome from node_modules");
+    } else {
+      console.log("FontAwesome not found in node_modules");
+    }
+  } catch (error) {
+    console.error("Error setting up FontAwesome:", error);
+  }
 
   // Redirect root to logs page
   app.get('/', (req, res) => {

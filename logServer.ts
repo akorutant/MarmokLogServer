@@ -215,6 +215,7 @@ function setupServer() {
     console.error("Error setting up FontAwesome:", error);
   }
 
+
   // Redirect root to logs page
   app.get('/', (req, res) => {
     res.redirect('/logs');

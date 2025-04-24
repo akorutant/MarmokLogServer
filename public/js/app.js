@@ -81,6 +81,9 @@ function animateLogEntries() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Set dark mode as default
+    document.documentElement.classList.add('dark');
+    
     // Search functionality
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
@@ -99,47 +102,45 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
     
-    // Dark mode toggle
-    const themeToggle = document.getElementById('themeToggle');
-    if (themeToggle) {
-      const isDarkMode = localStorage.getItem('darkMode') === 'true';
-      
-      if (isDarkMode) {
-        document.documentElement.classList.add('dark');
-        themeToggle.innerHTML = '<i class="fas fa-sun text-yellow-500"></i>';
-      }
-      
-      themeToggle.addEventListener('click', function() {
-        const isDark = document.documentElement.classList.toggle('dark');
-        localStorage.setItem('darkMode', isDark);
-        
-        if (isDark) {
-          this.innerHTML = '<i class="fas fa-sun text-yellow-500"></i>';
-        } else {
-          this.innerHTML = '<i class="fas fa-moon text-gray-600"></i>';
-        }
-      });
-    }
-    
     // Live updates via SSE
-    if (window.location.pathname === '/logs') {
-      const eventSource = new EventSource('/logs/stream');
-      
-      eventSource.onmessage = function(event) {
-        const filesData = JSON.parse(event.data);
-        // Update file info if needed
-        console.log('Received update:', filesData.length + ' files');
-      };
-      
-      eventSource.onerror = function() {
-        console.error('SSE connection error');
-        eventSource.close();
-      };
-      
-      window.addEventListener('beforeunload', function() {
-        eventSource.close();
-      });
+    if (window.location.pathname === '/logs' || window.location.pathname === '/') {
+      try {
+        const eventSource = new EventSource('/logs/stream');
+        
+        eventSource.onmessage = function(event) {
+          const filesData = JSON.parse(event.data);
+          // You could implement real-time updates here
+          console.log('Received update:', filesData.length + ' files');
+        };
+        
+        eventSource.onerror = function() {
+          console.error('SSE connection error');
+          eventSource.close();
+        };
+        
+        window.addEventListener('beforeunload', function() {
+          eventSource.close();
+        });
+      } catch (error) {
+        console.error('Error setting up SSE:', error);
+      }
     }
+  
+    // Animate new entries
+    const animateNewEntries = () => {
+      const entries = document.querySelectorAll('.log-entry');
+      entries.forEach((entry, index) => {
+        entry.style.opacity = '0';
+        entry.style.transform = 'translateY(-10px)';
+        setTimeout(() => {
+          entry.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
+          entry.style.opacity = '1';
+          entry.style.transform = 'translateY(0)';
+        }, index * 50);
+      });
+    };
+  
+    animateNewEntries();
   });
 
 function updateLogsList(logs) {

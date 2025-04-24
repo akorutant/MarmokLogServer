@@ -1,35 +1,33 @@
-<div class="bg-white rounded-lg shadow-md p-6">
-    <h1 class="text-2xl font-bold mb-4 text-gray-800">
+<div class="bg-gray-800 rounded-lg shadow-md p-6">
+    <h1 class="text-2xl font-bold mb-4 text-white flex items-center">
         <i class="fas fa-folder-open mr-2 text-blue-500"></i>
         Log Directory Structure
     </h1>
     
-    <div class="mb-4">
-        <div class="bg-gray-50 rounded-lg p-2 text-sm">
-            <span class="mr-4"><i class="fas fa-info-circle text-blue-500 mr-1"></i> Navigate through your log files</span>
-            <span><i class="fas fa-filter text-gray-500 mr-1"></i> Use the search to filter logs</span>
-        </div>
+    <div class="mb-4 bg-gray-900 rounded-lg p-3">
+        <span class="mr-4 text-blue-300"><i class="fas fa-info-circle mr-1"></i> Navigate through your log files</span>
+        <span class="text-blue-300"><i class="fas fa-filter mr-1"></i> Use the search to filter logs</span>
     </div>
     
     <div class="overflow-x-auto">
-        <div class="space-y-2">
+        <div class="space-y-1">
             <% function renderTree(items, level = 0) { %>
                 <% items.forEach(item => { %>
                     <div class="pl-<%= level * 4 %> log-entry">
-                        <div class="flex items-center p-2 hover:bg-gray-50 rounded <%= item.type === 'directory' ? 'font-bold' : '' %>">
+                        <div class="flex items-center p-2 hover:bg-gray-700 rounded-md text-gray-200 <%= item.type === 'directory' ? 'font-bold' : '' %>">
                             <% if (item.type === 'directory') { %>
                                 <i class="fas fa-folder text-yellow-500 mr-2"></i>
                             <% } else { %>
-                                <i class="fas fa-file-alt text-blue-500 mr-2"></i>
+                                <i class="fas fa-file-alt text-blue-400 mr-2"></i>
                             <% } %>
                             
                             <span class="flex-1"><%= item.name %></span>
                             
                             <% if (item.type === 'file') { %>
-                                <span class="text-sm text-gray-500 mr-4">
+                                <span class="text-sm text-gray-400 mr-4">
                                     <%= item.size.toFixed(2) %> KB
                                 </span>
-                                <span class="text-sm text-gray-500 mr-4">
+                                <span class="text-sm text-gray-400 mr-4">
                                     <%= item.modified.toLocaleDateString('en-US', { 
                                         year: 'numeric', 
                                         month: 'short', 
@@ -39,12 +37,12 @@
                                     }) %>
                                 </span>
                                 <a href="/logs/view?file=<%= encodeURIComponent(item.path) %>" 
-                                   class="text-blue-500 hover:text-blue-700 mr-2 p-2 rounded hover:bg-gray-100"
+                                   class="text-blue-400 hover:text-blue-300 mr-2 p-1 rounded hover:bg-gray-600"
                                    title="View">
                                     <i class="fas fa-eye"></i>
                                 </a>
                                 <a href="/logs/download?file=<%= encodeURIComponent(item.path) %>" 
-                                   class="text-green-500 hover:text-green-700 p-2 rounded hover:bg-gray-100"
+                                   class="text-green-400 hover:text-green-300 p-1 rounded hover:bg-gray-600"
                                    title="Download">
                                     <i class="fas fa-download"></i>
                                 </a>
@@ -61,7 +59,7 @@
     </div>
     
     <% if (logs.length === 0) { %>
-        <div class="mt-4 text-center text-gray-500 p-8 bg-gray-50 rounded-lg">
+        <div class="mt-4 text-center text-gray-400 p-8 bg-gray-700 rounded-lg">
             <i class="fas fa-folder-open text-3xl mb-2"></i>
             <p>No log files found in the directory</p>
             <p class="text-sm mt-2">Log files will appear here once they are generated</p>

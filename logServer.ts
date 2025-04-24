@@ -34,7 +34,6 @@ interface LogFileData {
   modified: Date;
 }
 
-// Handle paths that start with ~ by expanding to home directory
 const expandPath = (filepath: string) => {
   if (filepath.startsWith('~')) {
     return filepath.replace('~', os.homedir());
@@ -54,7 +53,6 @@ const authConfig = {
   realm: 'Logs Dashboard'
 };
 
-// Этот фрагмент кода нужно добавить/изменить в функцию buildLogStructure() в logServer.ts
 
 const buildLogStructure = () => {
   const structure: LogEntry[] = [];
@@ -64,7 +62,6 @@ const buildLogStructure = () => {
       const entries = fs.readdirSync(dirPath, { withFileTypes: true });
 
       entries.forEach(entry => {
-        // Пропускаем audit.json файлы и .gz архивы
         if (entry.name.endsWith('-audit.json') || entry.name.endsWith('.gz')) {
           return;
         }
@@ -101,7 +98,7 @@ const buildLogStructure = () => {
   return structure;
 };
 
-// Также нужно изменить функцию streamHandler для фильтрации .gz файлов
+
 const streamHandler: RequestHandler = (req, res) => {
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
@@ -201,7 +198,6 @@ watcher
 function setupServer() {
   const app = express();
 
-  // Setup authentication for protected routes
   const secureRoutes = ['/', '/logs', '/logs/view', '/logs/download', '/logs/stream'];
   secureRoutes.forEach(route => {
     app.use(route, (req, res, next) => {
@@ -212,19 +208,15 @@ function setupServer() {
 
   app.use(expressLayouts);
 
-  // Fix static file paths for standalone structure
   app.use('/assets/css', express.static(join(__dirname, 'public/css')));
   app.use('/assets/js', express.static(join(__dirname, 'public/js')));
   app.use('/assets/fonts', express.static(join(__dirname, 'assets/fonts')));
   
-  // Serve local FontAwesome if available
   app.use('/assets/fontawesome', express.static(join(__dirname, 'public/fontawesome')));
   
-  // Fix view paths 
   app.set('views', join(__dirname, 'views'));
   app.set('view engine', 'ejs');
   
-  // Backup FontAwesome path from node_modules (with proper MIME types)
   try {
     const nodemodulesPath = path.resolve(__dirname, 'node_modules');
     const fontAwesomePath = join(nodemodulesPath, '@fortawesome/fontawesome-free');
@@ -256,7 +248,6 @@ function setupServer() {
   }
 
 
-  // Redirect root to logs page
   app.get('/', (req, res) => {
     res.redirect('/logs');
   });
@@ -378,13 +369,11 @@ function setupServer() {
   return app;
 }
 
-// Start the server
 function startServer() {
   const app = setupServer();
   const port = Number(process.env.LOG_PORT) || 3001;
   const domain = process.env.DOMAIN;
 
-  // Check if SSL certificates are provided
   if (process.env.SSL_KEY_PATH && process.env.SSL_CERT_PATH) {
     try {
       const sslKey = fs.readFileSync(expandPath(process.env.SSL_KEY_PATH));

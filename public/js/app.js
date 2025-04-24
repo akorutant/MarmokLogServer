@@ -1,43 +1,63 @@
 document.addEventListener('DOMContentLoaded', function() {
+    loadFontAwesome();
+    
     initThemeToggle();
     initSearch();
     initMobileLayout();
     
-    // Анимация элементов списка логов
+    filterGzFiles();
+    
     document.querySelectorAll('.log-entry').forEach((entry, index) => {
         entry.style.animationDelay = `${index * 0.03}s`;
     });
     
-    // Подсветка JSON в режиме просмотра логов
     if (window.location.href.includes('/logs/view')) {
         highlightJson();
     }
-    
-    // Настройка кнопки копирования
-    checkFontAwesome();
-
-    setupCopyButton();
-    
-    // Настройка SSE для обновления списка файлов в реальном времени
-    setupServerSentEvents();
-    
-    // Фильтрация .gz файлов при загрузке страницы
-    filterGzFiles();
 });
 
-// Функция переключения темы
+function loadFontAwesome() {
+    setTimeout(function() {
+        const testIcon = document.createElement('i');
+        testIcon.className = 'fas fa-check';
+        testIcon.style.visibility = 'hidden';
+        document.body.appendChild(testIcon);
+        
+        const computed = window.getComputedStyle(testIcon);
+        const isFontAwesomeLoaded = computed.fontFamily.indexOf('Font Awesome') !== -1 || 
+                                   computed.fontFamily.indexOf('FontAwesome') !== -1;
+        
+        document.body.removeChild(testIcon);
+        
+        if (!isFontAwesomeLoaded) {
+            console.log('FontAwesome not loaded, loading from CDN...');
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+            document.head.appendChild(link);
+        }
+    }, 300);
+}
+
+function filterGzFiles() {
+    document.querySelectorAll('.log-entry').forEach(entry => {
+        const nameElement = entry.querySelector('span');
+        if (nameElement && nameElement.textContent.endsWith('.gz')) {
+            entry.style.display = 'none';
+        }
+    });
+}
+
 function initThemeToggle() {
     const themeToggle = document.getElementById('themeToggle');
     const navThemeBtn = document.getElementById('navThemeBtn');
     
-    // Загружаем сохраненную тему
     const isDarkMode = localStorage.getItem('darkMode') === 'true';
     if (isDarkMode) {
         document.body.classList.add('dark-mode');
         updateThemeIcons(true);
     }
     
-    // Обработчики для кнопок переключения темы
     if (themeToggle) {
         themeToggle.addEventListener('click', toggleTheme);
     }
@@ -46,19 +66,17 @@ function initThemeToggle() {
         navThemeBtn.addEventListener('click', toggleTheme);
     }
 
-    // Функция переключения темы
     function toggleTheme() {
         const isDark = document.body.classList.toggle('dark-mode');
         localStorage.setItem('darkMode', isDark);
         updateThemeIcons(isDark);
     }
     
-    // Обновление иконок темы
     function updateThemeIcons(isDark) {
         if (themeToggle) {
             themeToggle.innerHTML = isDark 
-                ? '<i class="fas fa-sun text-yellow-500"></i>' 
-                : '<i class="fas fa-moon text-gray-600"></i>';
+                ? '<i class="fas fa-sun" style="color: #f59e0b;"></i>' 
+                : '<i class="fas fa-moon"></i>';
         }
         
         if (navThemeBtn) {
@@ -75,7 +93,6 @@ function initThemeToggle() {
     }
 }
 
-// Функция для настройки поиска
 function initSearch() {
     const searchInput = document.getElementById('searchInput');
     const mobileSearchBtn = document.getElementById('mobileSearchBtn');
@@ -83,16 +100,15 @@ function initSearch() {
     const mobileSearchInput = document.getElementById('mobileSearchInput');
     const navSearchBtn = document.getElementById('navSearchBtn');
     
-    // Функция фильтрации логов
     function filterLogs(searchText) {
         const text = searchText.toLowerCase();
         document.querySelectorAll('.log-entry').forEach(entry => {
-            // Получаем имя файла для проверки на .gz
-            const fileName = entry.querySelector('span')?.textContent || '';
-            const isGzFile = fileName.endsWith('.gz');
+            const nameElement = entry.querySelector('span');
+            const isGzFile = nameElement && nameElement.textContent.endsWith('.gz');
             
-            // Показываем только подходящие и не .gz файлы
-            if (entry.textContent.toLowerCase().includes(text) && !isGzFile) {
+            const isMatch = entry.textContent.toLowerCase().includes(text);
+            
+            if (isMatch && !isGzFile) {
                 entry.style.display = '';
             } else {
                 entry.style.display = 'none';
@@ -100,7 +116,6 @@ function initSearch() {
         });
     }
     
-    // Обработчики для полей поиска
     if (searchInput) {
         searchInput.addEventListener('input', function() {
             filterLogs(this.value);
@@ -119,7 +134,6 @@ function initSearch() {
         });
     }
     
-    // Обработчики для мобильных кнопок поиска
     if (mobileSearchBtn && mobileSearchContainer) {
         mobileSearchBtn.addEventListener('click', function() {
             mobileSearchContainer.classList.toggle('hidden');
@@ -142,17 +156,14 @@ function initSearch() {
     }
 }
 
-// Функция для настройки мобильного интерфейса
 function initMobileLayout() {
     const mobileNavBar = document.getElementById('mobileNavBar');
     const mainContent = document.querySelector('main');
     
-    // Добавляем отступ для контента при наличии фиксированной навигации
     if (mobileNavBar && mainContent && window.innerWidth < 768) {
         mainContent.style.paddingBottom = '60px';
     }
     
-    // Увеличиваем область тача для кнопок на мобильных
     if (window.innerWidth < 768) {
         document.querySelectorAll('a, button').forEach(el => {
             if (el.clientHeight < 32 && !el.closest('#logContent')) {
@@ -166,7 +177,6 @@ function initMobileLayout() {
     }
 }
 
-// Функция для подсветки JSON в логах
 function highlightJson() {
     const logContent = document.querySelector('#logContent pre');
     if (!logContent) return;
@@ -174,7 +184,6 @@ function highlightJson() {
     try {
         const content = logContent.textContent;
         
-        // Ищем JSON объекты и подсвечиваем их в зависимости от уровня лога
         const highlighted = content.replace(/(\{.*?\})/g, function(match) {
             try {
                 const json = JSON.parse(match);
@@ -196,213 +205,25 @@ function highlightJson() {
     }
 }
 
-// Настройка кнопки копирования содержимого логов
-function setupCopyButton() {
-    const copyBtn = document.getElementById('copyBtn');
-    if (copyBtn) {
-        copyBtn.addEventListener('click', function () {
-            const logContent = document.getElementById('logContent');
-            const content = logContent?.textContent || '';
-
-            navigator.clipboard.writeText(content).then(() => {
-                const btn = this;
-                const originalText = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check mr-1"></i> Copied!';
-                btn.classList.add('bg-green-100', 'text-green-700');
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                    btn.classList.remove('bg-green-100', 'text-green-700');
-                }, 2000);
-            });
-        });
-    }
-}
-
-// Настройка SSE для обновления списка файлов
-function setupServerSentEvents() {
-    if (window.location.pathname === '/logs') {
-        const eventSource = new EventSource('/logs/stream');
-        
-        eventSource.onmessage = function(event) {
-            try {
-                const filesData = JSON.parse(event.data);
-                console.log('Received update:', filesData.length + ' files');
-                
-                // Фильтруем только .log файлы (не .gz)
-                const filteredData = filesData.filter(file => 
-                    file.name.endsWith('.log') && !file.name.endsWith('.gz')
-                );
-                
-                if (filteredData.length > 0) {
-                    updateLogsList(filteredData);
-                }
-            } catch (error) {
-                console.error('Error processing server update:', error);
-            }
-        };
-        
-        eventSource.onerror = function() {
-            console.error('SSE connection error');
-            eventSource.close();
-            
-            // Попытка переподключения через 5 секунд
-            setTimeout(setupServerSentEvents, 5000);
-        };
-        
-        window.addEventListener('beforeunload', function() {
-            eventSource.close();
-        });
-    }
-}
-
-// Функция для обновления списка логов с корректными иконками
-function updateLogsList(logs) {
-    const logContainer = document.querySelector('.log-list') || document.querySelector('.space-y-2');
-    if (!logContainer || !logs || !logs.length) return;
-
-    // Для таблицы (если она используется как контейнер)
-    if (logContainer.tagName === 'TBODY') {
-        logContainer.innerHTML = logs.map(file => `
-      <tr class="log-entry">
-        <td class="px-6 py-4 whitespace-nowrap">
-          <i class="fas fa-file-code text-blue-500 mr-2"></i>
-          ${file.name}
-        </td>
-        <td class="px-6 py-4 whitespace-nowrap">
-          ${file.size.toFixed(2)} KB
-        </td>
-        <td class="px-6 py-4 whitespace-nowrap">
-          ${new Date(file.modified).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit'
-        })}
-        </td>
-        <td class="px-6 py-4 whitespace-nowrap">
-          <a href="/logs/view?file=${encodeURIComponent(file.path)}" 
-             class="text-blue-500 hover:text-blue-700 mr-4">
-            <i class="fas fa-eye"></i>
-          </a>
-          <a href="/logs/download?file=${encodeURIComponent(file.path)}" 
-             class="text-green-500 hover:text-green-700">
-            <i class="fas fa-download"></i>
-          </a>
-        </td>
-      </tr>
-    `).join('');
-    } 
-    // Для вложенной структуры (если используется древовидное представление)
-    else if (logContainer.classList.contains('space-y-2')) {
-        // Создадим временный контейнер для новых элементов
-        const tempContainer = document.createElement('div');
-        
-        // Отсортируем по каталогам сначала
-        const sortedLogs = [...logs].sort((a, b) => {
-            // Директории идут первыми
-            if (a.type === 'directory' && b.type !== 'directory') return -1;
-            if (a.type !== 'directory' && b.type === 'directory') return 1;
-            // Затем сортировка по имени
-            return a.name.localeCompare(b.name);
-        });
-        
-        // Создаем элементы для каждого файла
-        for (const file of sortedLogs) {
-            if (file.name.endsWith('.gz')) continue; // Пропускаем .gz файлы
-            
-            const entry = document.createElement('div');
-            entry.className = "log-entry";
-            
-            // Внутреннее содержимое зависит от типа (файл/директория)
-            if (file.type === 'file') {
-                entry.innerHTML = `
-                <div class="flex items-center p-2 hover:bg-gray-50 rounded">
-                    <i class="fas fa-file-alt text-blue-500 mr-2"></i>
-                    <span class="flex-1">${file.name}</span>
-                    <span class="text-sm text-gray-500 mr-4">
-                        ${file.size.toFixed(2)} KB
-                    </span>
-                    <span class="text-sm text-gray-500 mr-4">
-                        ${new Date(file.modified).toLocaleDateString('en-US', { 
-                            year: 'numeric', 
-                            month: 'short', 
-                            day: '2-digit',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        })}
-                    </span>
-                    <a href="/logs/view?file=${encodeURIComponent(file.path)}" 
-                       class="text-blue-500 hover:text-blue-700 mr-2 p-2 rounded hover:bg-gray-100"
-                       title="View">
-                        <i class="fas fa-eye"></i>
-                    </a>
-                    <a href="/logs/download?file=${encodeURIComponent(file.path)}" 
-                       class="text-green-500 hover:text-green-700 p-2 rounded hover:bg-gray-100"
-                       title="Download">
-                        <i class="fas fa-download"></i>
-                    </a>
-                </div>
-                `;
-            } else {
-                // Для директорий (если понадобится)
-                entry.innerHTML = `
-                <div class="flex items-center p-2 hover:bg-gray-50 rounded font-bold">
-                    <i class="fas fa-folder text-yellow-500 mr-2"></i>
-                    <span class="flex-1">${file.name}</span>
-                </div>
-                `;
-                // Здесь можно добавить рекурсивное построение дерева, если нужно
-            }
-            
-            tempContainer.appendChild(entry);
+const copyBtn = document.getElementById('copyBtn');
+if (copyBtn) {
+    copyBtn.addEventListener('click', function() {
+        const logContent = document.getElementById('logContent');
+        if (logContent) {
+            navigator.clipboard.writeText(logContent.textContent || '')
+                .then(() => {
+                    const btn = this;
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = '<i class="fas fa-check mr-1"></i> Copied!';
+                    btn.classList.add('bg-green-100', 'text-green-700');
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                        btn.classList.remove('bg-green-100', 'text-green-700');
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('Error copying text:', err);
+                });
         }
-        
-        // Заменяем содержимое контейнера
-        logContainer.innerHTML = tempContainer.innerHTML;
-    }
-
-    // Анимируем новые элементы
-    document.querySelectorAll('.log-entry').forEach((entry, index) => {
-        entry.style.animationDelay = `${index * 0.03}s`;
     });
-}
-
-// Добавьте эту функцию для проверки состояния FontAwesome
-function checkFontAwesome() {
-    // Проверяем, загрузился ли FontAwesome
-    const testIcon = document.createElement('i');
-    testIcon.className = 'fas fa-check';
-    document.body.appendChild(testIcon);
-    
-    const computed = window.getComputedStyle(testIcon);
-    const isFontAwesomeLoaded = computed.fontFamily.includes('Font Awesome') || 
-                              computed.fontFamily.includes('FontAwesome');
-    
-    document.body.removeChild(testIcon);
-    
-    // Если FontAwesome не загрузился, попробуем загрузить его через CDN
-    if (!isFontAwesomeLoaded) {
-        console.warn('FontAwesome not loaded, attempting to load from CDN...');
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
-        document.head.appendChild(link);
-    }
-}
-
-// Функция фильтрации .gz файлов при загрузке страницы
-function filterGzFiles() {
-    if (window.location.pathname === '/logs') {
-        // Ждем небольшую задержку для гарантии загрузки DOM
-        setTimeout(() => {
-            document.querySelectorAll('.log-entry').forEach(entry => {
-                const fileName = entry.querySelector('span')?.textContent || '';
-                // Скрываем все .gz файлы
-                if (fileName.endsWith('.gz')) {
-                    entry.style.display = 'none';
-                }
-            });
-        }, 100);
-    }
 }

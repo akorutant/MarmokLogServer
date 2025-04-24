@@ -10,7 +10,6 @@
                 <span class="mr-4 hidden md:inline"><i class="fas fa-info-circle text-blue-500 mr-1"></i> Log file content</span>
             </div>
             <div class="flex items-center">
-                <!-- Кнопки управления для мобильных устройств -->
                 <div class="flex space-x-2 md:hidden mr-2">
                     <button id="increaseFont" class="text-gray-600 p-1 rounded hover:bg-gray-100">
                         <i class="fas fa-search-plus"></i>
@@ -20,7 +19,6 @@
                     </button>
                 </div>
                 
-                <!-- Кнопка копирования -->
                 <button id="copyBtn" class="text-sm px-3 py-1 bg-gray-100 text-gray-600 rounded hover:bg-gray-200">
                     <i class="fas fa-copy mr-1"></i> <span class="hidden md:inline">Copy to clipboard</span><span class="md:hidden">Copy</span>
                 </button>
@@ -38,14 +36,12 @@
             <i class="fas fa-arrow-left mr-2"></i><span class="hidden md:inline">Back to list</span><span class="md:hidden">Back</span>
         </a>
         
-        <!-- Индикатор строк/размера для десктопа -->
         <div class="hidden md:block text-sm text-gray-500">
             <span id="lineCount">0</span> lines | <span id="fileSize"><%= (content.length / 1024).toFixed(2) %></span> KB
         </div>
     </div>
 
     <script>
-        // Функция для выделения JSON в логах
         function colorizeLogContent() {
             const logContent = document.getElementById('logContent');
             const preElement = logContent.querySelector('pre');
@@ -55,11 +51,9 @@
             const content = preElement.textContent;
             
             try {
-                // Считаем количество строк
                 const lineCount = content.split('\n').length;
                 document.getElementById('lineCount').textContent = lineCount;
                 
-                // Пытаемся раскрасить JSON
                 const colorized = content.replace(/(\{.*?\})/g, function (match) {
                     try {
                         const json = JSON.parse(match);
@@ -97,7 +91,6 @@
             }
         }
 
-        // Функция копирования в буфер обмена
         document.getElementById('copyBtn').addEventListener('click', function () {
             const logContent = document.getElementById('logContent');
             const content = logContent.textContent || '';
@@ -114,37 +107,32 @@
             });
         });
 
-        // Инициализация после загрузки DOM
         document.addEventListener('DOMContentLoaded', function() {
             colorizeLogContent();
             
-            // Функционал изменения размера шрифта
             const increaseFont = document.getElementById('increaseFont');
             const decreaseFont = document.getElementById('decreaseFont');
             const logContent = document.getElementById('logContent');
             
             if (increaseFont && decreaseFont && logContent) {
-                // Определяем начальный размер шрифта
                 let fontSize = parseInt(window.getComputedStyle(logContent).fontSize) || 14;
                 
                 increaseFont.addEventListener('click', function() {
-                    fontSize = Math.min(fontSize + 2, 24); // Максимум 24px
+                    fontSize = Math.min(fontSize + 2, 24); 
                     logContent.style.fontSize = fontSize + 'px';
                 });
                 
                 decreaseFont.addEventListener('click', function() {
-                    fontSize = Math.max(fontSize - 2, 10); // Минимум 10px
+                    fontSize = Math.max(fontSize - 2, 10);
                     logContent.style.fontSize = fontSize + 'px';
                 });
                 
-                // Двойное нажатие для увеличения (для удобства на мобильных)
                 logContent.addEventListener('dblclick', function() {
                     fontSize = Math.min(fontSize + 2, 24);
                     logContent.style.fontSize = fontSize + 'px';
                 });
             }
             
-            // Добавляем поддержку горизонтального свайпа для прокрутки в логах
             if (logContent) {
                 let touchStartX = 0;
                 let scrollLeft = 0;

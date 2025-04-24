@@ -26,12 +26,10 @@
                             <span class="flex-1 truncate"><%= item.name %></span>
                             
                             <% if (item.type === 'file') { %>
-                                <!-- Информация о файле - адаптивное отображение -->
                                 <span class="text-sm text-gray-500 mr-2 hidden md:inline">
                                     <%= item.size.toFixed(2) %> KB
                                 </span>
                                 
-                                <!-- Десктопное отображение даты -->
                                 <span class="text-sm text-gray-500 mr-2 hidden md:inline">
                                     <%= item.modified.toLocaleDateString('en-US', { 
                                         year: 'numeric', 
@@ -42,7 +40,6 @@
                                     }) %>
                                 </span>
                                 
-                                <!-- Мобильное отображение даты -->
                                 <span class="text-xs text-gray-500 mr-1 md:hidden">
                                     <%= item.modified.toLocaleDateString('en-US', { 
                                         month: 'short', 
@@ -50,7 +47,6 @@
                                     }) %>
                                 </span>
                                 
-                                <!-- Действия с файлом -->
                                 <div class="flex items-center">
                                     <a href="/logs/view?file=<%= encodeURIComponent(item.path) %>" 
                                        class="text-blue-500 hover:text-blue-700 mr-1 p-1 md:p-2 rounded hover:bg-gray-100"

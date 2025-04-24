@@ -1,39 +1,18 @@
-<footer class="mt-4 border-t border-gray-200">
-    <div class="container mx-auto px-4 py-3">
-        <div class="flex flex-col md:flex-row justify-between items-center">
-            <div class="text-xs text-gray-500 mb-2 md:mb-0 text-center md:text-left">
-                © 2024 MarmokBot Logs Manager
-            </div>
-            
-            <div class="flex space-x-4">
-                <a href="https://github.com/akorutant/MarmokBot" target="_blank" class="text-gray-500 hover:text-blue-600 text-sm">
-                    <i class="fab fa-github"></i>
-                    <span class="ml-1 hidden md:inline">GitHub</span>
-                </a>
-                <span class="text-gray-500 text-sm">
-                    <i class="fas fa-circle text-green-500 animate-pulse"></i>
-                    <span class="ml-1 hidden md:inline">Server Online</span>
-                </span>
-            </div>
+<footer class="mt-8 border-t border-gray-200">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+        <div class="text-sm text-gray-500">
+            © 2024 MarmokBot Logs Manager. v1.0.0
         </div>
-    </div>
-    
-    <div id="mobileNavBar" class="fixed bottom-0 left-0 right-0 md:hidden bg-white shadow-lg border-t border-gray-200 py-2 z-10">
-        <div class="flex justify-around">
-            <a href="/logs" class="flex flex-col items-center text-gray-700">
-                <i class="fas fa-home"></i>
-                <span class="text-xs mt-1">Home</span>
+        <div class="flex space-x-4">
+            <a href="/docs" class="text-gray-500 hover:text-blue-600 transition-colors">
+                <i class="fas fa-book mr-1"></i>Documentation
             </a>
-            
-            <button id="navSearchBtn" class="flex flex-col items-center text-gray-700">
-                <i class="fas fa-search"></i>
-                <span class="text-xs mt-1">Search</span>
-            </button>
-            
-            <button id="navThemeBtn" class="flex flex-col items-center text-gray-700">
-                <i class="fas fa-moon"></i>
-                <span class="text-xs mt-1">Theme</span>
-            </button>
+            <a href="https://github.com/akorutant/MarmokBot" target="_blank" class="text-gray-500 hover:text-blue-600 transition-colors">
+                <i class="fab fa-github mr-1"></i>GitHub
+            </a>
+            <span class="text-gray-500">
+                <i class="fas fa-circle text-green-500 animate-pulse mr-1"></i>Server status: Online
+            </span>
         </div>
     </div>
 </footer>

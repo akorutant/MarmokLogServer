@@ -1,5 +1,58 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
+/* Минимальные стили для мобильных устройств */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+    
+    h1.text-2xl {
+        font-size: 1.25rem !important;
+    }
+    
+    .p-6 {
+        padding: 1rem !important;
+    }
+    
+    .log-entry {
+        padding-top: 0.375rem;
+        padding-bottom: 0.375rem;
+    }
+    
+    #logContent {
+        font-size: 0.75rem;
+    }
+    
+    #logContent pre {
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+    
+    a.p-2, button.p-2 {
+        min-height: 2.5rem;
+        min-width: 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .text-sm {
+        font-size: 0.75rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+    
+    body {
+        font-size: 0.875rem;
+    }
+}
+
 :root {
     --color-primary: #3b82f6;
     --color-secondary: #10b981;

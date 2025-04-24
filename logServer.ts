@@ -170,17 +170,20 @@ function setupServer() {
     });
   });
 
-
   app.use(expressLayouts);
 
-
-  // Static file serving - fix the paths to match your new structure
+  // Fix static file paths for standalone structure
   app.use('/assets/css', express.static(join(__dirname, 'public/css')));
   app.use('/assets/js', express.static(join(__dirname, 'public/js')));
   app.use('/assets/fonts', express.static(join(__dirname, 'assets/fonts')));
-  app.set('views', join(process.cwd(), 'views'));
-  app.set('view engine', 'ejs'); 
-  app.use('/fonts', express.static(join(__dirname, 'node_modules/@fortawesome/fontawesome-free')));
+  
+  // Fix view paths 
+  app.set('views', join(__dirname, 'views'));
+  app.set('view engine', 'ejs');
+  
+  // Fix fontawesome path
+  const nodemodulesPath = path.resolve(__dirname, 'node_modules');
+  app.use('/fonts', express.static(join(nodemodulesPath, '@fortawesome/fontawesome-free')));
 
   // Redirect root to logs page
   app.get('/', (req, res) => {
@@ -324,7 +327,9 @@ function startServer() {
       const server = https.createServer(httpsOptions, app);
       server.listen(port, '0.0.0.0', () => {
         console.log(`🔐 HTTPS Log dashboard running at https://0.0.0.0:${port}/logs`);
-        console.log(`🔐 HTTPS Log dashboard available at https://${domain}:${port}/logs`);
+        if (domain) {
+          console.log(`🔐 HTTPS Log dashboard available at https://${domain}:${port}/logs`);
+        }
       });
     } catch (error) {
       console.error('Error setting up HTTPS server:', error);
@@ -341,7 +346,9 @@ function startHttpServer(app: express.Express, port: number) {
   const domain = process.env.DOMAIN;
   app.listen(port, '0.0.0.0', () => {
     console.log(`📋 HTTP Log dashboard running at http://0.0.0.0:${port}/logs`);
-    console.log(`📋 HTTP Log dashboard available at http://${domain}:${port}/logs`);
+    if (domain) {
+      console.log(`📋 HTTP Log dashboard available at http://${domain}:${port}/logs`);
+    }
   });
 }
 

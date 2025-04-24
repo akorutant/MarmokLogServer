@@ -7,7 +7,7 @@
   "main": "build/logServer.js",
   "scripts": {
     "build": "tsc && npm run copy-assets",
-    "copy-assets": "mkdir -p build/views build/public && cp -r views/* build/views/ && cp -r public/* build/public/",
+    "copy-assets": "mkdir -p build/views build/public build/assets && cp -r views/* build/views/ && cp -r public/* build/public/ && cp -r assets/* build/assets/ 2>/dev/null || :",
     "dev": "nodemon --watch '*.ts' --exec \"node --no-warnings --loader ts-node/esm logServer.ts\"",
     "start": "node build/logServer.js",
     "watch": "nodemon -e ts,ejs --exec npm run dev",

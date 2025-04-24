@@ -80,68 +80,31 @@ function animateLogEntries() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Set dark mode as default
-    document.documentElement.classList.add('dark');
-    
-    // Search functionality
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-      searchInput.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
-        const logEntries = document.querySelectorAll('.log-entry');
-        
-        logEntries.forEach(entry => {
-          const entryName = entry.querySelector('span').textContent.toLowerCase();
-          if (entryName.includes(searchTerm)) {
-            entry.style.display = '';
-          } else {
-            entry.style.display = 'none';
-          }
-        });
-      });
-    }
-    
-    // Live updates via SSE
-    if (window.location.pathname === '/logs' || window.location.pathname === '/') {
-      try {
+document.addEventListener('DOMContentLoaded', animateLogEntries);
+
+if (window.location.pathname.includes('/logs') && !window.location.pathname.includes('/view')) {
+    try {
         const eventSource = new EventSource('/logs/stream');
-        
-        eventSource.onmessage = function(event) {
-          const filesData = JSON.parse(event.data);
-          // You could implement real-time updates here
-          console.log('Received update:', filesData.length + ' files');
+
+        eventSource.onmessage = (e) => {
+            try {
+                const logs = JSON.parse(e.data);
+                updateLogsList(logs);
+            } catch (error) {
+                console.error('Error parsing log data:', error);
+            }
         };
-        
-        eventSource.onerror = function() {
-          console.error('SSE connection error');
-          eventSource.close();
+
+        eventSource.onerror = () => {
+            console.log('SSE connection closed or errored');
+            setTimeout(() => {
+                eventSource.close();
+            }, 5000);
         };
-        
-        window.addEventListener('beforeunload', function() {
-          eventSource.close();
-        });
-      } catch (error) {
+    } catch (error) {
         console.error('Error setting up SSE:', error);
-      }
     }
-  
-    // Animate new entries
-    const animateNewEntries = () => {
-      const entries = document.querySelectorAll('.log-entry');
-      entries.forEach((entry, index) => {
-        entry.style.opacity = '0';
-        entry.style.transform = 'translateY(-10px)';
-        setTimeout(() => {
-          entry.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
-          entry.style.opacity = '1';
-          entry.style.transform = 'translateY(0)';
-        }, index * 50);
-      });
-    };
-  
-    animateNewEntries();
-  });
+}
 
 function updateLogsList(logs) {
     const logContainer = document.querySelector('.log-list') || document.querySelector('.space-y-2');
